@@ -1,0 +1,17 @@
+{
+    "name": "ecoride/ecoride",
+    "description": "ecoride est une plateforme de covoiturage ecologique",
+    "autoload": {
+        "psr-4": {
+            "Ecoride\\Ecoride\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nadia"
+        }
+    ],
+    "require": {
+        "mongodb/mongodb": "^1.19"
+    }
+}
