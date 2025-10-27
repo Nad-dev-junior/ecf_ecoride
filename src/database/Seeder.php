@@ -15,6 +15,7 @@ class Seeder
     private array $userIds = [];
     private array $voitureIds = [];
     private array $marqueIds = [];
+    private array $stats = [];
 
     // initialiser la connexion
     public function __construct()
@@ -32,7 +33,7 @@ class Seeder
         $this->seedMarques();
         $this->seedUsers();
         $this->seedVoitures();
-        // $this->seedUserRoles();
+        $this->seedUserRoles();
         // $this->seedCovoiturages();
         // $this->seedReservations();
         // $this->seedAvis();
@@ -71,7 +72,7 @@ class Seeder
     // cette function permetra de creer des marques de façon aléatoir
     private function seedMarques(): void
     {
-        echo "creation de marque de voiture";
+        echo "creation de marque de voiture \n";
         $marques = [
             'Renault',
             'Peugeot',
@@ -218,7 +219,7 @@ class Seeder
         echo $countVoiture . "voitures crees \n";
     }
     /**
-     * Genere un numero d'immatriculation au format francais
+     * Genere un numero d'immatriculation 
      * @return string
      */
     private function generationImmatriculation(): string
@@ -230,5 +231,81 @@ class Seeder
             substr(str_shuffle($letters), 0, 2) . '-' .
             substr(str_shuffle($numbers), 0, 3) . '-' .
             substr(str_shuffle($letters), 0, 2);
+    }
+
+    private function seedUserRoles(): void{
+        echo "Attribution des roles aux Utilisateurs...\n";
+
+          // $stats est le tableau qui nous indiquera le nombre d'utilisateur avec le role passager,
+        // le nombre d'utilisateur avec le role conducteur
+        // et le nombre d'utilisateur avec les deux roles.
+        $stats=[
+            'role_passager' =>0,
+            'role_conducteur' =>0,
+            'role_both' =>0
+        ];
+foreach($this->userIds as $userId){
+    $hasCar = $this->userHasCar($userId);
+
+     if($hasCar){
+            $this->assignRole($userId,1);
+
+            // 70% des chauffeurs sont aussi passagers 
+            if($this->faker->boolean(70)){
+                $this->assignRole($userId,2);
+                $stats['role_passager_chauffeur']++;
+            }else{
+                     $stats['role_conducteur']++;
+            }
+        }else{
+            // utlisateur sans vehicule = passager
+            $this->assignRole($userId,2);
+            $stats['role_passager']++;
+          }
+}
+    
+    // Affichage de la repartition 
+    //Chauffeur|passager|chauffeur-passager
+    $this->displayStatiscs($stats);
+}
+/**
+     * Verifie si un utilisateur possede un vehicule en BDD
+     * @param $userId l'identifiant de l'utilisateur dont on souhaite verifier la possession d'un vehicule
+     * @return bool
+     */
+    private function userHasCar(int $userId): bool
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT 1 FROM voiture WHERE user_id = :user_id LIMIT 1");
+            $stmt->execute(['user_id' => $userId]);
+
+            return $stmt->fetch() !== false;
+        } catch (\PDOException $e) {
+            echo "Erreur verification voiture pour utilisateur $userId: {$e->getMessage()}";
+            return false;
+        }
+    }
+    //cette fonction permet d'assigner un role a un utilisateur dans la table role_user
+    private function assignRole($userId, $roleId):void{
+        try{
+            $stmt= $this->db->prepare("INSERT INTO role_user(user_id, role_id)VALUES(?,?)");
+            $stmt->execute([$userId,$roleId]);
+        }catch(\PDOException $e){
+            // Ignorer les doublons
+            if($e->getCode() === '23000'){
+                // Violation de contrainte d'unicite
+                echo "role deja assigne: Utilisateur $userId -Role $roleId \n";
+                return;
+            }else{
+                throw $e;
+            }
+        }
+    }
+// cette fonction permet d'afficher le nombre de chauffeur, passager et chauffeur-passager
+    private function displayStatiscs(array $stats):void{
+        echo "repartition des roles \n";
+        echo "passagers:{$stats['role_passager']} \n";
+        echo "chauffeurs:{$stats['role_conducteur']} \n";
+        echo "chauffeurs_passagers:{$stats['role_passager_chauffeur']} \n";
     }
 }
