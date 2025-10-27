@@ -237,29 +237,29 @@ class Seeder
         echo "Attribution des roles aux Utilisateurs...\n";
 
           // $stats est le tableau qui nous indiquera le nombre d'utilisateur avec le role passager,
-        // le nombre d'utilisateur avec le role conducteur
+        // le nombre d'utilisateur avec le role chauffeur
         // et le nombre d'utilisateur avec les deux roles.
         $stats=[
             'role_passager' =>0,
             'role_conducteur' =>0,
-            'role_both' =>0
+            'role_passager_chauffeur' =>0
         ];
 foreach($this->userIds as $userId){
     $hasCar = $this->userHasCar($userId);
 
      if($hasCar){
-            $this->assignRole($userId,1);
+            $this->assignRole($userId,2);
 
             // 70% des chauffeurs sont aussi passagers 
             if($this->faker->boolean(70)){
-                $this->assignRole($userId,2);
+                $this->assignRole($userId,1);
                 $stats['role_passager_chauffeur']++;
             }else{
                      $stats['role_conducteur']++;
             }
         }else{
             // utlisateur sans vehicule = passager
-            $this->assignRole($userId,2);
+            $this->assignRole($userId,1);
             $stats['role_passager']++;
           }
 }
