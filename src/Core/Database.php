@@ -9,7 +9,7 @@ use PDOException;
 class Database
 {
     private static $host = 'localhost';
-    private static $dbname = 'bdd_ecoride';
+    private static $dbname = 'ecoride';
     private static $username = 'root';
     private static $password = 'MysqlN04@';
     private static ?Database $instance = null;

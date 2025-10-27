@@ -1,6 +1,9 @@
 <?php
-
 namespace Ecoride\Ecoride\Core;
+// faire tcheker
+require Config_DIR . '/Database.php';
+require Config_DIR . '/mongodb.php';
+
 
 abstract class Model
 {

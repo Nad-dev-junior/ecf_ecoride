@@ -13,5 +13,8 @@
     ],
     "require": {
         "mongodb/mongodb": "^1.19"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24"
     }
 }
