@@ -15,8 +15,7 @@ class Seeder
     private array $userIds = [];
     private array $voitureIds = [];
     private array $marqueIds = [];
-    private array $stats = [];
-
+    private array $covoiturageIds = [];
     // initialiser la connexion
     public function __construct()
     {
@@ -27,17 +26,17 @@ class Seeder
     //   cette fonction permet de lancer les differentes methodes de génération des données de test
     public function run(): void
     {
-        // creation des donnees de test.
+        echo "creation des donnees de test. \n";
 
         $this->clearExistingData();
         $this->seedMarques();
         $this->seedUsers();
         $this->seedVoitures();
         $this->seedUserRoles();
-        // $this->seedCovoiturages();
-        // $this->seedReservations();
-        // $this->seedAvis();
-        // $this->seedMongoData();
+        $this->seedCovoiturages();
+        $this->seedReservations();
+        $this->seedAvis();
+        $this->seedPreferences();
 
         echo "generation des donnees termiee avec succes ! \n";
     }
@@ -186,15 +185,13 @@ class Seeder
 
         // Je boucle sur tous les utilisateurs stockés dans $this->userIds
         // pour correspondre  une voiture à un utilisateur.
-        foreach ($this->userIds as $userId) {
+        foreach ($this->userIds as $userId) { // choisir une marque au hasard dans celles disponibles en base
+            $marque = $this->faker->randomElement($marques);
+            // je génère un nom de modèle aléatoire pour éviter les erreurs.
+            $modeles = $modelesParMarque[$marque->libelle] ?? [$this->faker->word . ' ' . $this->faker->numberBetween(1, 9)];
+            //  choisir un modèle aléatoire dans la liste de cette marque.
+            $modele = $this->faker->randomElement($modeles);
             if ($this->faker->boolean(60)) {
-                // choisir une marque au hasard dans celles disponibles en base
-                $marque = $this->faker->randomElement($marques);
-                // je génère un nom de modèle aléatoire pour éviter les erreurs.
-                $modeles = $modelesParMarque[$marque->libelle] ?? [$this->faker->word . ' ' . $this->faker->numberBetween(1, 9)];
-                //  choisir un modèle aléatoire dans la liste de cette marque.
-                $modele = $this->faker->randomElement($modeles);
-
                 // Je prépare les informations de la voiture sous forme de tableau associatif
                 // Ces données seront insérées dans la table `voiture`
                 $infoVoiture = [
@@ -202,8 +199,8 @@ class Seeder
                     'immatriculation' => $this->generationImmatriculation(),
                     'energie' => $this->faker->randomElement(['0', '1']),
                     'couleur' => $this->faker->colorName,
-                    'nb_places' => $this->faker->numberBetween(3, 7),
-                    'date_premiere_immatriculation' => $this->faker->dateTimeBetween('-8 years, -1 years')->format('y-m-d'),
+                    'nb_places' => $this->faker->numberBetween(3, 20),
+                    'date_premiere_immatriculation' => $this->faker->dateTimeBetween('-7 years, -1 weeks')->format('y-m-d'),
                     'user_id' => $userId,
                     'marque_id' => $marque->marque_id
                 ];
@@ -233,42 +230,42 @@ class Seeder
             substr(str_shuffle($letters), 0, 2);
     }
 
-    private function seedUserRoles(): void{
+    private function seedUserRoles(): void
+    {
         echo "Attribution des roles aux Utilisateurs...\n";
 
-          // $stats est le tableau qui nous indiquera le nombre d'utilisateur avec le role passager,
+        // $stats est le tableau qui nous indiquera le nombre d'utilisateur avec le role passager,
         // le nombre d'utilisateur avec le role chauffeur
         // et le nombre d'utilisateur avec les deux roles.
-        $stats=[
-            'role_passager' =>0,
-            'role_conducteur' =>0,
-            'role_passager_chauffeur' =>0
+        $stats = [
+            'role_passager' => 0,
+            'role_chauffeur' => 0,
+            'role_passager_chauffeur' => 0
         ];
-foreach($this->userIds as $userId){
-    $hasCar = $this->userHasCar($userId);
+        foreach ($this->userIds as $userId) {
+            $hasCar = $this->userHasCar($userId);
 
-     if($hasCar){
-            $this->assignRole($userId,2);
+            if ($hasCar) {
+                $this->assignRole($userId, 2);
+                if ($this->faker->boolean(70)) {
+                    // 70% des chauffeurs sont aussi passagers 
 
-            // 70% des chauffeurs sont aussi passagers 
-            if($this->faker->boolean(70)){
-                $this->assignRole($userId,1);
-                $stats['role_passager_chauffeur']++;
-            }else{
-                     $stats['role_conducteur']++;
+                    $this->assignRole($userId, 1);
+                    $stats['role_passager_chauffeur']++;
+                } else {
+                    $stats['role_chauffeur']++;
+                }
+            } else {
+                // utlisateur sans vehicule = passager
+                $this->assignRole($userId, 1);
+                $stats['role_passager']++;
             }
-        }else{
-            // utlisateur sans vehicule = passager
-            $this->assignRole($userId,1);
-            $stats['role_passager']++;
-          }
-}
-    
-    // Affichage de la repartition 
-    //Chauffeur|passager|chauffeur-passager
-    $this->displayStatiscs($stats);
-}
-/**
+        }
+        // Affichage de la repartition Chauffeur | Passager | Chauffeur-Passager
+        $this->displayStatiscs($stats);
+    }
+
+    /**
      * Verifie si un utilisateur possede un vehicule en BDD
      * @param $userId l'identifiant de l'utilisateur dont on souhaite verifier la possession d'un vehicule
      * @return bool
@@ -286,26 +283,261 @@ foreach($this->userIds as $userId){
         }
     }
     //cette fonction permet d'assigner un role a un utilisateur dans la table role_user
-    private function assignRole($userId, $roleId):void{
-        try{
-            $stmt= $this->db->prepare("INSERT INTO role_user(user_id, role_id)VALUES(?,?)");
-            $stmt->execute([$userId,$roleId]);
-        }catch(\PDOException $e){
+    private function assignRole($userId, $roleId): void
+    {
+        try {
+            $stmt = $this->db->prepare("INSERT INTO role_user(user_id, role_id)VALUES(?,?)");
+            $stmt->execute([$userId, $roleId]);
+        } catch (\PDOException $e) {
             // Ignorer les doublons
-            if($e->getCode() === '23000'){
+            if ($e->getCode() === '23000') {
                 // Violation de contrainte d'unicite
                 echo "role deja assigne: Utilisateur $userId -Role $roleId \n";
                 return;
-            }else{
+            } else {
                 throw $e;
             }
         }
     }
-// cette fonction permet d'afficher le nombre de chauffeur, passager et chauffeur-passager
-    private function displayStatiscs(array $stats):void{
+    // cette fonction permet d'afficher le nombre de chauffeur, passager et chauffeur-passager
+    private function displayStatiscs(array  $stats): void
+    {
         echo "repartition des roles \n";
         echo "passagers:{$stats['role_passager']} \n";
-        echo "chauffeurs:{$stats['role_conducteur']} \n";
+        echo "chauffeurs:{$stats['role_chauffeur']} \n";
         echo "chauffeurs_passagers:{$stats['role_passager_chauffeur']} \n";
+    }
+
+    private function seedCovoiturages(): void
+    {
+        echo "création des covoiturages. \n";
+
+        $villes = [
+            'Paris',
+            'Lyon',
+            'Marseille',
+            'Toulouse',
+            'Nice',
+            'Nantes',
+            'Strasbourg',
+            'Montpellier',
+            'Bordeaux',
+            'Lille',
+            'Rennes',
+            'Reims',
+            'Le Havre',
+            'Saint-Étienne',
+            'Toulon',
+            'Grenoble',
+            'Dijon',
+            'Angers',
+            'Villeurbanne',
+            'Le Mans'
+        ];
+
+        $countCovoiturage = 0;
+        foreach ($this->voitureIds as $voitureId) {
+            $stmt = $this->db->prepare("SELECT user_id FROM voiture WHERE voiture_id = :voiture_id");
+            $stmt->execute(['voiture_id' => $voitureId]);
+            $voiture = $stmt->fetch();
+            $conducteurId = $voiture->user_id;
+
+            //generer des covoiturages entre 0 et 10.
+            $nbCovoiturages = $this->faker->numberBetween(0, 10);
+            // Boucle pour créer autant de covoiturages que le nombre généré précédemment
+            for ($i = 0; $i < $nbCovoiturages; $i++) {
+                // Génère une date de départ aléatoire entre demain et dans un mois
+                $dateDepart = $this->faker
+                    ->dateTimeBetween('+1 days', '+1 months');
+                $heureDepart = $this->faker->time('H:i:s');
+
+                // Génère une durée de trajet aléatoire en minutes (entre 1h et 4h)
+                $dureeTrajet = $this->faker->numberBetween(60, 240);
+                // Sélectionne une ville de départ aléatoire parmi la liste $villes
+                $lieuDepart = $this->faker->randomElement($villes);
+                $lieuArrivee = $this->faker->randomElement(array_diff($villes, [$lieuDepart]));
+                // Prépare les informations du covoiturage sous forme de tableau associatif
+                $infoCovoiturage = [
+                    'date_depart' => $dateDepart->format('Y-m-d'),
+                    'heure_depart' => $heureDepart,
+                    'lieu_depart' => $lieuDepart,
+                    'date_arrivee' => $dateDepart->format('Y-m-d'),
+                    // Heure d’arrivée calculée à partir de la date de départ + durée du trajet
+                    'heure_arrivee' => $this->generateArrivalTime($dateDepart, $dureeTrajet),
+                    'lieu_arrivee' => $lieuArrivee,
+                    // Statut aléatoire du covoiturage parmi une liste donnée
+                    'statut' => $this->faker->randomElement(['prevu', 'annule', 'en cours', 'termine', 'prevu', 'prevu']),
+                    'nb_places' => $this->faker->numberBetween(1, 20),
+                    'prix_personne' => $this->faker->numberBetween(5, 50),
+                    'conducteur_id' => $conducteurId,
+                    'voiture_id' => $voitureId,
+                    // Date de création du covoiturage aléatoire entre il y a 1 mois et 1 semaine
+                    'date_creation' => $this->faker->dateTimeBetween('-1 months', '-1 weeks')->format('Y-m-d')
+                ];
+                // Prépare la requête SQL d'insertion dans la table "covoiturage"
+                // On utilise des paramètres nommés pour éviter les injections SQL
+                $stmt = $this->db
+                    ->prepare(
+                        "INSERT INTO covoiturage (
+                     date_depart, heure_depart, lieu_depart, date_arrivee, heure_arrivee, 
+                     lieu_arrivee, statut, nb_places, prix_personne, conducteur_id, 
+                     voiture_id, date_creation) VALUES ( 
+                     :date_depart, :heure_depart, :lieu_depart, :date_arrivee, :heure_arrivee, 
+                     :lieu_arrivee, :statut, :nb_places, :prix_personne, :conducteur_id, 
+                     :voiture_id, :date_creation)"
+                    );
+
+                // Exécute la requête en liant automatiquement les valeurs de $infoCovoiturage
+                $stmt->execute($infoCovoiturage);
+
+                // Récupère l'identifiant du dernier covoiturage inséré et le stocke dans un tableau
+                $this->covoiturageIds[] = $this->db->lastInsertId();
+                $countCovoiturage++;
+            }
+        }
+        //  faire le compte du nombre de covoiturage crées;
+        echo " $countCovoiturage covoiturages crees \n";
+    }
+
+    private function generateArrivalTime($dateDepart, $dureeTrajet)
+    {
+        // Clone l'objet DateTime de départ pour ne pas modifier l’original
+        $arrival = clone $dateDepart;
+        // Ajoute la durée du trajet en minutes à la date/heure de départ  
+        $arrival->modify("+{$dureeTrajet} minutes");
+
+        return $arrival->format('H:i:s');
+    }
+
+    private function seedReservations(): void{
+        echo "creation des reservations \n";
+        $countReservation = 0;
+
+        foreach($this->covoiturageIds as $covoiturageId)
+        {
+            $stmt= $this->db->prepare("SELECT nb_places, conducteur_id FROM covoiturage WHERE covoiturage_id = :covoiturage_id");
+
+            $stmt->execute(['covoiturage_id'=>$covoiturageId]);
+            $covoiturage = $stmt->fetch();
+            $nbPlacesDispo= $covoiturage->nb_places;
+            $conducteurId= $covoiturage->conducteur_id;
+
+            // generer aléatoirement  des reservations en fonction des places disponibles
+            $nbReservations= $this->faker->numberBetween(1, $nbPlacesDispo);
+
+            $passagersAyantReserve = [];
+
+            for($i=0; $i< $nbReservations; $i++){
+                // Une reservation est faite uniquement aux utilisateurs autres que le chauffeur,
+                  // Ou au utilisateurs n'ayant pas encore de reservation.
+                  $passagersDispo = array_diff($this->userIds, [$conducteurId], $passagersAyantReserve);
+                  if (empty($passagersDispo)) break;
+
+                  $passagerId = $this->faker->randomElement($passagersDispo);
+                $passagersAyantReserve[] = $passagerId;
+
+                $infoResa = [
+                    'passager_id' => $passagerId,
+                    'covoiturage_id' => $covoiturageId,
+                    'statut' => $this->faker->randomElement(['en attente', 'confirme', 'annule', 'confirme', 'confirme']),
+                    'nb_place_reservee' => $this->faker->numberBetween(1, mt_rand(1, $nbPlacesDispo)),
+                    'date_creation' => $this->faker->dateTimeBetween('-4 days')->format('Y-m-d')
+                ];
+
+                try {
+                    $stmt = $this->db->prepare(
+                        "INSERT INTO reservation (
+                     passager_id, covoiturage_id, statut, nb_place_reservee, date_creation)  
+                    VALUES (:passager_id, :covoiturage_id, :statut, :nb_place_reservee, :date_creation)");
+
+                    $stmt->execute($infoResa);
+                    $countReservation++;
+                } catch (\PDOException $e) {
+                    // Ignorer les doublons
+                    continue;
+                }
+            }
+           
+        }
+        echo "$countReservation reservations crees. \n";
+    } 
+
+    private function seedAvis(){
+        echo "Création des avis \n";
+        // un avis peut etre donne que lorsqu'un covoiturage est terminé,
+        // on a besoin d'une reservation confirme et d'un covoiturage terminer.
+
+        $stmt = $this->db->query("
+        SELECT  r.passager_id, r.covoiturage_id, c.conducteur_id
+        FROM reservation r
+        JOIN covoiturage c ON r.covoiturage_id = c.covoiturage_id
+        WHERE r.statut = 'confirme' AND c.statut = 'termine'
+    ");
+
+    //On récupère tous les résultats sous forme de tableau d’objets ou de tableaux associatifs
+    $reservations = $stmt->fetchAll();
+ // Compteur pour suivre combien d’avis seront créés au total
+    $countAvis = 0;
+
+    //  On suppose que seulement 60% des utilisateurs laissent un avis
+    foreach ($reservations as $reservation) {
+        // On suppose que seul 60% de nos utilisateurs vont donner des avis
+        if ($this->faker->boolean(60)) {
+
+            $infoAvis = [
+                'commentaire' => $this->faker->optional(0.8)->realText($this->faker->numberBetween(50, 1000)),
+                'note' => $this->faker->numberBetween(1, 5),
+                'statut' => $this->faker->randomElement(['publie', 'modere', 'modere', 'modere']),
+                'passager_id' => $reservation->passager_id,
+                'conducteur_id' => $reservation->conducteur_id,
+                'covoiturage_id'=> $reservation->covoiturage_id,
+                'date_creation' => $this->faker->dateTimeBetween('-12 months')->format('Y-m-d')
+            ];
+           // Préparation d'une requête SQL d'insertion sécurisée dans la table avis;
+            $stmt = $this->db->prepare(
+                "INSERT INTO avis (commentaire, note, statut, passager_id, conducteur_id, covoiturage_id, date_creation)
+                VALUES (:commentaire, :note, :statut, :passager_id, :conducteur_id, :covoiturage_id, :date_creation)");
+//Exécution de la requête en liant les valeurs contenues dans $infoAvis.
+            $stmt->execute($infoAvis);
+            $countAvis++;
+        }
+    }
+
+    echo  $countAvis . " avis crees.\n";
+    }
+
+    private function seedPreferences(): void
+    {
+        echo "Creations des preferences utilisateurs...\n";
+
+        $countPreference = 0;
+       // On parcourt tous les identifiants d’utilisateurs enregistrés
+        foreach ($this->userIds as $userId) {
+              // Vérifie si cet utilisateur possède le rôle "chauffeur" (role_id = 2)
+        // On prépare une requête pour rechercher une correspondance dans la table role_user
+            $stmt = $this->db->prepare("SELECT role_id FROM role_user WHERE user_id = ? AND role_id = 2");
+            $stmt->execute([$userId]);
+
+            $result = $stmt->fetch();
+            //Si un résultat existe, cela veut dire que l'utilisateur est un chauffeur
+            if ($result) {
+                $preferences = [
+                    ['propriete' => 'Musique autorisee', 'valeur' => 'non'],
+                    ['propriete' => 'Animaux autorises', 'valeur' => 'non'],
+                ];
+
+                foreach ($preferences as $preference) {
+                    $stmt = $this->db->prepare(
+                        "INSERT INTO preference (propriete, valeur, conducteur_id) VALUES (?, ?, ?)"
+                    );
+                    //Exécute la requête en liant les valeurs de la préférence actuelle et l’ID du chauffeur
+                    $stmt->execute([$preference['propriete'], $preference['valeur'], $userId]);
+
+                    //Incrémente le compteur total de préférences créées
+                    $countPreference++;
+                }
+            }
+        }
+        echo " $countPreference preferences creees.\n";
     }
 }

@@ -129,3 +129,5 @@ INSERT INTO role (libelle)
     VALUES
         ('passager'),
         ('chauffeur');
+
+        ALTER TABLE avis MODIFY commentaire TEXT NULL ;
