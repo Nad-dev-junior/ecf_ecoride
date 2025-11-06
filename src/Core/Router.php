@@ -57,11 +57,10 @@ class Router
     {
         // Si le callback est une chaîne de type "Controller@method"
         if (is_string($callback)) {
-            list($controllerName, $method) = explode('@', $callback); //RideController@search
-            $controllerName = 'Ridecontroller';
-            $method = 'search';
+            list($controllerName, $method) = explode('@', $callback);
             // Construit le namespace complet du contrôleur
             $controller = "Ecoride\\Ecoride\\Controllers\\$controllerName";
+           
             // Vérifie si le contrôleur existe
             if (class_exists($controller)) {
                 $controllerInstance = new $controller();
@@ -72,7 +71,7 @@ class Router
 
                 return $this->handleError('Methode introuvable');
             }
-
+         
             return $this->handleError('Controleur introuvable');
         }
 
@@ -99,7 +98,8 @@ class Router
     public function renderView($view, $data = []): bool
     {
         extract($data);
-        require_once "../src/Views/$view.php";
+        require_once "../src/Views/{$view}.php";
         return true;
     }
 }
+//

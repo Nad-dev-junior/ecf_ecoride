@@ -131,3 +131,10 @@ INSERT INTO role (libelle)
         ('chauffeur');
 
         ALTER TABLE avis MODIFY commentaire TEXT NULL ;
+
+-- ces champs seront renseigners si l'utilisateur souhaite devenire chauffeur.
+        ALTER TABLE user MODIFY nom VARCHAR(64) NULL ;
+        ALTER TABLE user MODIFY prenom VARCHAR(64) NULL;
+ALTER TABLE user MODIFY adresse VARCHAR(64) NULL;
+ALTER TABLE user MODIFY telephone VARCHAR(64) NULL;
+ALTER TABLE user MODIFY date_naissance DATE NULL;

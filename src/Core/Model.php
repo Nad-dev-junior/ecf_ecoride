@@ -1,8 +1,8 @@
 <?php
 namespace Ecoride\Ecoride\Core;
 // faire tcheker
-require Config_DIR . '/Database.php';
-require Config_DIR . '/mongodb.php';
+require   '../Core/Database.php';
+require  '../Core/mongodb.php';
 
 
 abstract class Model
@@ -26,7 +26,7 @@ abstract class Model
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
-   // Récupère toutes les lignes de la table SQL
+   // Récupère toutes les lignes de la table SQL;
     public function find_all(): false|array
     {
         $stmt = $this->connection->prepare("SELECT * FROM {$this->table}");
