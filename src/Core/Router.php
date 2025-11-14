@@ -27,10 +27,10 @@ class Router
 
     public function dispatch()
     {
-        // Récupère l'URL demandée ou une chaîne vide par défaut
-        $url = $_GET['url'] ?? '';
-        // Récupère la méthode HTTP utilisée (GET ou POST)
-        $method = $_SERVER['REQUEST_METHOD'];
+
+       // URL demandée
+       $url = $_GET['url'] ?? '';
+        $method = $_SERVER['REQUEST_METHOD'] ;
         // Parcourt les routes enregistrées pour cette méthode
         foreach ($this->routes[$method] as $path => $callback) {
             // Si l'URL correspond à une route enregistrée
@@ -47,8 +47,8 @@ class Router
     }
     private function matchRoute($route, $url): bool
     {
-        $route = trim($route, '/');
-        $url = trim($url, '/');
+        $route = '/' . trim($route, '/');
+        $url = '/' . trim($url, '/');
 
         return $route === $url;
     }

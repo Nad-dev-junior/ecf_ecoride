@@ -138,3 +138,6 @@ INSERT INTO role (libelle)
 ALTER TABLE user MODIFY adresse VARCHAR(64) NULL;
 ALTER TABLE user MODIFY telephone VARCHAR(64) NULL;
 ALTER TABLE user MODIFY date_naissance DATE NULL;
+
+ALTER TABLE user add remember_token VARCHAR(128);
+ ALTER TABLE user CHANGE remember_token remember_me VARCHAR(128) NULL ;

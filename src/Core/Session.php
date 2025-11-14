@@ -3,7 +3,7 @@
 namespace Ecoride\Ecoride\Core;
 
 class Session {
-    public function _construc(){
+    public function __construct(){
         if(session_status()=== PHP_SESSION_NONE){
             session_start();
         }

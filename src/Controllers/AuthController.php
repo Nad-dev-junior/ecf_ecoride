@@ -3,25 +3,16 @@
 namespace Ecoride\Ecoride\Controllers;
 
 use Ecoride\Ecoride\Core\Controller;
-use Ecoride\Ecoride\Core\Session;
-use Ecoride\Ecoride\Services\AuthService;
 
 class AuthController extends Controller{ 
-    protected Session $session;
-    private AuthService $auth;
-    public function __construct()
-    {
-        $this->session = new Session();
-        $this->auth = new AuthService();
-    }
 
     public function register(): void
     {
         $this->renderView('auth/register', [
-            'title' => "Inscription | EcoRide"
+            'title' => "Inscription | " . APP_NAME 
         ]);
     }
-    public function handleRegister(): void
+    public function handle_Register(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/login');
@@ -59,6 +50,40 @@ class AuthController extends Controller{
 
     public function login(): void
     {
-        $this->renderView('auth/login', ['title' => "Connexion | Ecoride"]);
+        $this->renderView('auth/login', ['title' => "Connexion |" . APP_NAME]);
     }
+
+    public function handle_login(): void{
+        // si la page n'est pas accedee en POST ,on redirige,il y a violation de protocol
+        if($_SERVER['REQUEST_METHOD']!=='POST'){
+            $this->redirect('/login');
+        }
+
+        $identifier = sanitize($_POST['pseudo'] ?? '');
+        $password= sanitize($_POST['password']?? '');
+
+        if(empty($identifier)|| empty($password)){
+            $this->session->set_flash('error',"veuillez remplir tous les champs");
+            $this->redirect('/login');
+        }
+
+        // je tchecke si le remember est cocher.
+        $remember= isset($_POST['remember_me']);
+
+        if($this->auth->attempt_to_connect($identifier, $password, $remember)){
+            // si cette fonction renvoie un test positif ,je connecte l'utilisateur et je le redirige vers sa page profil.
+
+            $this->session->set_flash('succes', 'connexion reussie');
+            $this->redirect('/profile');
+        }else{
+            // sinon l'utilisateur sera rediriger vers le formulaire de connexion.
+            $this->session->set_flash('error','pseudo ou mot de passe incorrect.');
+            $this->redirect('/login');
+        }
+    }
+    public function logout(): void
+    {
+        $this->auth->logout();
+    }
+
 }

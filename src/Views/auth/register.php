@@ -1,5 +1,3 @@
-<?php require_once __DIR__. '/../partials/header.php';
-?>
 <!-- cette section va afficher si l'inscription a été pris en compte ou non -->
 <section class="flash-messages">
     <div class="container">
@@ -80,6 +78,3 @@
         </div>
     </div>
 </section>
-
-<?php require_once  __DIR__. '/../partials/footer.php';
-?>

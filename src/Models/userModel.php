@@ -55,4 +55,17 @@ class UserModel
         return $stmt->fetchColumn() > 0;
     }
 
+    // cette fonction permet de recuperer un utilisateur en bd via son adresse email ou son pseudo.
+    public function find_by_username_or_email(string $identifier): mixed
+    {
+        $stmt = $this->connection->prepare("SELECT * FROM user WHERE pseudo = ? OR email = ?");
+        $stmt->execute([$identifier, $identifier]);
+        return $stmt->fetch();
+    }
+    public function find_by_rember_token(string $token): mixed
+    {
+        $stmt = $this->connection->prepare("SELECT * FROM user WHERE remember_me = ?");
+        $stmt->execute([$token]);
+        return $stmt->fetch();
+    }
 }
