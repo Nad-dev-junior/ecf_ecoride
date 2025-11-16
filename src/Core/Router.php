@@ -31,12 +31,17 @@ class Router
        // URL demandée
        $url = $_GET['url'] ?? '';
         $method = $_SERVER['REQUEST_METHOD'] ;
+
+        $params = [];
+        foreach ($_GET as $key => $value) {
+            $params[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        }
         // Parcourt les routes enregistrées pour cette méthode
         foreach ($this->routes[$method] as $path => $callback) {
             // Si l'URL correspond à une route enregistrée
             if ($this->matchRoute($path, $url)) {
                 // Exécute le callback associé à cette route
-                return $this->executeCallback($callback);
+                return $this->executeCallback($callback, $params);
             }
         }
         return

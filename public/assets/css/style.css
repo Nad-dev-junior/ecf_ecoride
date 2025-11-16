@@ -9,6 +9,7 @@
     --light-green: #d9ef82;
     --main-green: #b5d43b;
     --main-green: hsla(72, 64%, 53%, 100%);
+    --main-green-40: hsla(72, 64%, 80%, 100%);
     --main-green-80: hsla(72, 64%, 80%, 100%);
     --main-green-90: hsla(72, 64%, 90%, 100%);
     --main-green-95: hsla(72, 64%, 95%, 100%);
@@ -35,19 +36,20 @@
 }
 
 .er-text-dark {
-    color: var(--chinese-black);
+    color: var(--chinese-black) !important;
 }
 
+
 .er-text-light {
-    color: var(--light-gray);
+    color: var(--light-gray) !important;
 }
 
 .er-text-green {
-    color: var(--main-green);
+    color: var(--main-green) !important;
 }
 
 .er-text-pale-orange {
-    color: var(--pale-orange);
+    color: var(--pale-orange) !important;
 }
 
 .fw-100 {
@@ -110,7 +112,7 @@
     font-size: 48px;
 }
 
-.bg-chinese {
+.btn-bg-chinese {
     background-color: var(--chinese-black);
     color: var(--main-green);
 
@@ -118,6 +120,36 @@
         background-color: var(--main-green) !important;
         color: var(--chinese-black);
     }
+}
+.btn-bg-green-1 {
+    background-color: var(--main-green);
+    color: var(--chinese-black);
+
+    &:hover {
+        background-color: var(--chinese-black) !important;
+        color: var(--main-green);
+    }
+}
+
+
+.btn-bg-green-2 {
+    background-color: var(--main-green);
+    color: var(--chinese-black);
+
+    &:hover {
+        background-color: var(--main-green-40) !important;
+        color: var(--light-gray);
+    }
+}
+
+.bg-chinese {
+    background-color: var(--chinese-black);
+    color: var(--main-green);
+}
+
+.bg-green {
+    background-color: var(--main-green);
+    color: var(--chinese-black);
 }
 
 .er-header {

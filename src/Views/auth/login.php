@@ -50,7 +50,7 @@
                         <div class="mb-3 mt-5">
                             <div class="col-md-6 col-sm-8 mx-auto">
                                 <input type="submit" value="Se Connecter"
-                                    class="btn bg-chinese outfit fw-500 py-2 rounded-pill fs-18 w-100">
+                                    class="btn btn-bg-chinese outfit fw-500 py-2 rounded-pill fs-18 w-100">
                             </div>
                         </div>
                     </form>

@@ -12,6 +12,10 @@ class Session {
     public function set_session(string $key, mixed $value):void{
         $_SESSION[$key]=$value;
     }
+    public function get_session(string $key, $default = null): mixed
+    {
+        return $_SESSION[$key] ?? $default;
+    }
 
     public function remove_session(string $key):void{
         unset($_SESSION[$key]);

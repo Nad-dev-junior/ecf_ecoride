@@ -90,6 +90,11 @@ class AuthService
             'adresse' => $user->adresse ?? null,
             'photo' => $user->photo ?? null,
             'date_creation' => $user->date_creation ?? null,
+            'roles' => [
+                $this->userModel->is_driver($user->user_id) ? 'Chauffeur' : null,
+                $this->userModel->is_passenger($user->user_id) ? 'Passager' : null
+            ],
+            'adminInfo' => $this->userModel->get_role_info($user->user_id) ?? null
         ]);
         return true;
 

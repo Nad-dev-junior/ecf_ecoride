@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title><?= $title ?? 'Ecoride'?></title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="<?= assets('/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= assets('/css/style.css') ?>">
 </head>
@@ -31,6 +31,40 @@
                     <li class="nav-item">
                         <a href="#" class="nav-link  px-3 ms-3 er-text-dark">Contact</a>
                     </li>
+                    <?php
+                    if ($isLoggedIn && isset($currentUser)): ?>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" id="profileNavbar"
+                               data-bs-toggle="dropdown" role="button">
+                                <img src="<?= $user->photo ?? assets('img/avatar-default.png') ?>" width="36" alt="">
+                                <?= sanitize($user->pseudo ?? null) ?>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end px-1">
+                                <li>
+                                    <a href="<?= url('profile', ['pseudo' => $user->pseudo, 'nom' => $user->nom ?? ''])
+                                    ?>"
+                                       class="dropdown-item">Mon Profil</a>
+                                </li>
+                                <?php if ($isDriver) : ?>
+                                    <li>
+                                        <a href="#" class="dropdown-item">Proposer Un trajet</a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if ($currentUser['adminInfo']['name'] === "Administrateur") : ?>
+                                    <li>
+                                        <a href="#" class="dropdown-item">Ajouter Un nouvel Employe</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item">Tableau de Bord</a>
+                                    </li>
+                                <?php endif; ?>
+                                <li>
+                                    <a href="<?= url('/logout') ?>" class="dropdown-item text-danger">Deconnexion</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                    <?php else: ?>
                     <li class="nav-item">
                         <a href="<?= url('login') ?>" class="nav-link px-3 ms-3 er-text-dark ">Connexion</a>
                     </li>
@@ -38,8 +72,9 @@
                         <a href="<?= url('register') ?>"
                            class="nav-link er-subscribe bg-chinese px-3 ms-3 er-text-dark ">Inscription</a>
                     </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
     </nav>
-</header><?php
+</header>

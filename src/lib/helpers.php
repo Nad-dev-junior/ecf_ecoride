@@ -35,13 +35,27 @@ function assets(string $path)
     return $basePath . '/assets/' . ltrim($path, '/');
 }
 
-function url(string $path = ''): string
+function url(string $path = '',$params=[]): string
 {
     $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
     $basePath = str_replace(['public/index.php', 'index.php'], '', $scriptName);
     $basePath = rtrim($basePath, '/');
 
     $path = trim($path, '/');
-    return $basePath . ($path ? '/' . $path : '/');
+    $url=$basePath . ($path ? '/' . $path : '/');
+
+    if (!empty($params)) {
+        // Filtrer les parametre null ou vide, On conserve uniquement les parametres non null
+        // Tous les parametres null sont ignore
+        $filteredParams = array_filter($params, function($value) {
+            return $value !== null && trim((string)$value) !== '';
+        });
+
+        if (!empty($filteredParams)) {
+            $url .= '?' . http_build_query($filteredParams);
+        }
+       
+    }
+   return $url;
 }
 
