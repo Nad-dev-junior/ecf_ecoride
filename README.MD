@@ -40,7 +40,14 @@ Base relationnelle : MySQL / MariaDB
 
 Base NoSQL : MongoDB
 
+
+installation du projet en loclae:
+git clone https://github.com/votre-compte/EcoRide.git
+cd EcoRide
+
+
 Déploiement
+je n'ai pas encore deployé.
 
 
 
