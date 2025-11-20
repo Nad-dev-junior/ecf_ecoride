@@ -3,16 +3,18 @@
 namespace Ecoride\Ecoride\Models;
 
 use Ecoride\Ecoride\Core\Database;
+use Ecoride\Ecoride\Core\Model;
 use Ecoride\Ecoride\Core\RoleManager;
 
 // cette classe gère les opérations liées aux utilisateurs dans la base de données.
-class UserModel
+class UserModel extends Model
 {
 
-    private $connection;
+   protected \PDO  $connection;
 
     public function __construct()
     {
+        parent::__construct();
         $this->connection = Database::getInstance()->getConnection();
     }
 

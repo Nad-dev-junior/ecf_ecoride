@@ -1,13 +1,9 @@
 <?php
 namespace Ecoride\Ecoride\Core;
-// faire tcheker
-require   '../Core/Database.php';
-require  '../Core/mongodb.php';
-
 
 abstract class Model
 {
-    protected $connection;
+   protected \PDO $connection;
     protected $mongo;
     protected $table;
 
@@ -64,5 +60,17 @@ abstract class Model
         $collection = $this->mongo->getCollection($collection);
         return $collection->find($filter);
     }
+// recuperer les avis
+    public function get_notices() {
+        $stmt = $this->connection->query("
+            SELECT a.*, u.photo, u.nom, u.prenom
+            FROM avis a
+            JOIN user u ON a.passager_id = u.user_id
+            WHERE statut = 'publie' AND note >= '3.0'
+            ORDER BY date_creation DESC
+            LIMIT 12
+        ");
 
+        return $stmt->fetchAll();
+    }
 }
