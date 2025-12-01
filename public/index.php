@@ -38,6 +38,8 @@ $router->post('/register/handle', 'AuthController@handle_Register');
 $router->get('/login', 'AuthController@login');
 $router->post('/login/handle', 'AuthController@handle_login');
 $router->get('/profile', 'UserController@profile');
+$router ->get('/become-partner', 'PartnerController@become_partner');
+$router->post('/become-partner/handle','PartnerController@handle_become_partner');
 $router->get('/logout', 'AuthController@logout');
 
 

@@ -4,12 +4,15 @@ namespace Ecoride\Ecoride\Models;
 
 use Ecoride\Ecoride\Core\Database;
 use Ecoride\Ecoride\Core\Model;
+use Ecoride\Ecoride\Core\MongoManager;
 use Ecoride\Ecoride\Core\RoleManager;
+use InvalidArgumentException;
+use MongoDB\BSON\UTCDateTime;
 
 // cette classe gère les opérations liées aux utilisateurs dans la base de données.
 class UserModel extends Model
 {
-
+    protected string $table = 'user';
    protected \PDO  $connection;
 
     public function __construct()
@@ -17,14 +20,86 @@ class UserModel extends Model
         parent::__construct();
         $this->connection = Database::getInstance()->getConnection();
     }
-
-    public function create(array $data): bool
+    public function update_profile(int $userId, $profileData): bool
     {
-        $columns = implode(', ', array_keys($data)); // pseudo, email, password, credits
-        $placeholders = ':' . implode(', :', array_keys($data)); // :pseudo, :email, :password, :credits
-        $stmt = $this->connection->prepare("INSERT INTO user ($columns) VALUES ($placeholders)");
-        return $stmt->execute($data);
+        $allowedFields = [
+            'nom', 'prenom', 'email', 'password', 'telephone', 'adresse',
+            'pseudo', 'credits', 'role_admin', 'date_naissance', 'photo'
+        ];
+        $updates = [];
+        $params = [];
+        
+        $profileData = [
+            'nom' => sanitize($_POST['name'] ?? ''),
+            'prenom' => sanitize($_POST['firstname'] ?? ''),
+            'telephone' => sanitize($_POST['phone'] ?? ''),
+            'adresses' => sanitize($_POST['address'] ?? ''),
+            'date_naissance' => sanitize($_POST['birthdate'] ?? ''),
+        ];
+
+        foreach ($profileData as $key => $value) {
+            if (in_array($key, $allowedFields)) {
+                $updates[] = "$key = :$key"; //['nom' = ':nom', 'prenom' = ':prenom']
+                $params[$key] = $value; // ['nom' => 'Tuchel', 'prenom' => 'Doe']
+            }
+        }
+
+        if (empty($updates)) return false;
+
+        $sql = "UPDATE user SET " . implode(', ', $updates). " WHERE user_id = :user_id";
+        $params['user_id'] = $userId;
+
+        $stmt = $this->connection->prepare($sql);
+        return $stmt->execute($params);
     }
+
+    public function add_driver_role(int $userId): bool
+    {
+        $stmt = $this->connection->prepare("
+            INSERT INTO role_user (user_id, role_id) SELECT ?, role_id FROM role WHERE libelle = 'chauffeur'
+        ");
+
+        return $stmt->execute([$userId]);
+    }
+
+    public function add_passenger_role(int $userId): bool
+    {
+        $stmt = $this->connection->prepare("
+            INSERT INTO role_user (user_id, role_id) SELECT ?, role_id FROM role WHERE libelle = 'passager'
+        ");
+
+        return $stmt->execute([$userId]);
+    }
+
+    public function save_preferences_with_mysql(int $userId, array $preferences): true
+    {
+        $stmt = $this->connection->prepare(" INSERT INTO preference (propriete, valeur, conducteur_id) VALUES (?,?,?)");
+        foreach ($preferences as $key => $value) {
+            $stmt->execute([$key, $value, $userId]);
+        }
+
+        return true;
+    }
+
+    public function save_prefrences_with_mongoDB(int $userId, array $preferences): void
+    {
+        $mongoConnexion = MongoManager::getInstance();
+        $collection = $mongoConnexion->getCollection('preferences');
+
+        $document = [
+            'user_id' => $userId,
+            'preferences' => $preferences,
+            'updates_at' => new  UTCDateTime()
+        ];
+
+        // Ajout des preferences
+        $collection->updateOne(
+            ['user_id' => $userId],
+            ['$set' => $document],
+            ['upsert' => true]
+        );
+    }
+
 
     public function email_exist(string $email, ?int $excludeUserId = null): bool
     {

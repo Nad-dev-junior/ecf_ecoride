@@ -2,10 +2,12 @@
 
 namespace Ecoride\Ecoride\Services;
 
-class ValidationService
+use Ecoride\Ecoride\Core\Service;
+
+class ValidationService extends Service
 {
 
-    private array $errors = [];
+    protected array $errors = [];
 
     public function validate_required(string $field, mixed $value): bool
     {

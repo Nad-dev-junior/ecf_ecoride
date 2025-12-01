@@ -72,15 +72,13 @@
                                 </a>
                             <?php endif; ?>
                             <?php if (!$isDriver): ?>
-                                <a href="#" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400">
+                                <a href="<?= url('become-partner') ?>" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400">
                                     Devenir Partenaire
                                 </a>
                             <?php endif; ?>
-                            <?php if (!$isPassenger): ?>
                                 <a href="#" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400">
                                     Touver un covoiturage
                                 </a>
-                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-md-4 col-sm-12">

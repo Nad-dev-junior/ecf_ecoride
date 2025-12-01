@@ -44,5 +44,14 @@ class Session {
     {
         return isset( $_SESSION['flash'][$type]);
     }
+    public function set_session_data(string $key, array $data): void
+    {
+        $this->set_session($key, $data);
+    }
 
+    public function get_session_data(string $key) {
+        $data = $_SESSION[$key] ?? null;
+        unset($_SESSION[$key]);
+        return $data ?? [];
+    }
 }

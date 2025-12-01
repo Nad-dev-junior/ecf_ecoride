@@ -5,7 +5,7 @@ abstract class Model
 {
    protected \PDO $connection;
     protected $mongo;
-    protected $table;
+    protected string $table;
 
     public function __construct(){
         // Connexion MariaDB

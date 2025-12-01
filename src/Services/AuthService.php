@@ -1,21 +1,17 @@
 <?php
 namespace Ecoride\Ecoride\Services;
 
-use Ecoride\Ecoride\Core\Session;
-use Ecoride\Ecoride\Models\UserModel;
+use Ecoride\Ecoride\Core\Service;
 use Ecoride\Ecoride\Core\Database;
 
-class AuthService
+class AuthService extends Service
 {
-    private $session;
-    private $userModel;
-
+   
     private \PDO $db;
 
     public function __construct()
     {
-        $this->session = new Session();
-        $this->userModel = new UserModel();
+        parent::__construct();
         $this->db=Database::getInstance()->getConnection();
     }
 
@@ -79,25 +75,9 @@ class AuthService
             
         }
 
-        // je stocke les informations de l'utilisateur dans la session.
-        $this->session->set_session('user',[
-            'id'=>$user->user_id,
-            'nom'=>$user->nom ?? null,
-            'prenom' => $user->prenom ?? null,
-            'email' =>$user->email,
-            'pseudo' =>$user->pseudo,
-            'telephone'=>$user->telephone ?? null,
-            'adresse' => $user->adresse ?? null,
-            'photo' => $user->photo ?? null,
-            'date_creation' => $user->date_creation ?? null,
-            'roles' => [
-                $this->userModel->is_driver($user->user_id) ? 'Chauffeur' : null,
-                $this->userModel->is_passenger($user->user_id) ? 'Passager' : null
-            ],
-            'adminInfo' => $this->userModel->get_role_info($user->user_id) ?? null
-        ]);
+       
+        $this->update_user_session($user);
         return true;
-
        
     }
     public function login_with_remeber_toker(): bool
@@ -105,18 +85,7 @@ class AuthService
         if (isset($_COOKIE['remember_me'])) {
             $user = $this->userModel->find_by_rember_token($_COOKIE['remember_me']);
             if ($user) {
-                $this->session->set_session('user', [
-                    'id' => $user->user_id,
-                    'nom' => $user->nom ?? null,
-                    'prenom' => $user->prenom ?? null,
-                    'email' => $user->email,
-                    'pseudo' => $user->pseudo,
-                    'telephone' => $user->telephone ?? null,
-                    'adresse' => $user->adresse ?? null,
-                    'photo' => $user->photo ?? null,
-                    'date_creation' => $user->date_creation ?? null,
-                ]);
-
+                $this->update_user_session($user);
                 return true;
             }
         }
@@ -124,17 +93,5 @@ class AuthService
         return false;
     }
 
-    public function is_logged_in(): bool
-    {
-        return $this->session->has_session('user');
-    }
-
-    public function logout(): void
-    {
-        $this->session->remove_session('user');
-        setcookie('remember_me', '', time() - 3600, '/');
-        $this->session->destroy_session();
-        redirect('/login');
-    }
-    
+   
 }

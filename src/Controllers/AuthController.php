@@ -5,15 +5,22 @@ namespace Ecoride\Ecoride\Controllers;
 use Ecoride\Ecoride\Core\Controller;
 
 class AuthController extends Controller{ 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
 
     public function register(): void
     {
+        $this->service->require_guest();
         $this->renderView('auth/register', [
             'title' => "Inscription | " . APP_NAME 
         ]);
     }
     public function handle_Register(): void
     {
+        $this->service->require_guest();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/login');
         }
@@ -47,13 +54,16 @@ class AuthController extends Controller{
             $this->redirect('/register');
         }
     }
-
     public function login(): void
-    {
+    { $this->service->require_guest();
+
         $this->renderView('auth/login', ['title' => "Connexion |" . APP_NAME]);
     }
 
     public function handle_login(): void{
+        // si l'utilisateur est connecté le rediriger vers sa page profile.
+        $this->service->require_guest();
+
         // si la page n'est pas accedee en POST ,on redirige,il y a violation de protocol
         if($_SERVER['REQUEST_METHOD']!=='POST'){
             $this->redirect('/login');
@@ -83,7 +93,7 @@ class AuthController extends Controller{
     }
     public function logout(): void
     {
-        $this->auth->logout();
+        $this->service->logout();
     }
 
 }
