@@ -40,6 +40,9 @@ $router->post('/login/handle', 'AuthController@handle_login');
 $router->get('/profile', 'UserController@profile');
 $router ->get('/become-partner', 'PartnerController@become_partner');
 $router->post('/become-partner/handle','PartnerController@handle_become_partner');
+$router->get('/add-car', 'VehicleController@add_car');
+$router->post('/add-car/handle', 'VehicleController@handle_add_car');
+$router->post('add-preference/handle', 'UserController@handle_add_preference');
 $router->get('/logout', 'AuthController@logout');
 
 

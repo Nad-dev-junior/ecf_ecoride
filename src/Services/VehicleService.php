@@ -8,7 +8,7 @@ use Ecoride\Ecoride\Models\VehicleModel;
 class VehicleService extends Service
 {
     private ValidationService $validationService;
-    private VehicleModel $vehicleModel;
+  protected VehicleModel $vehicleModel;
 
     public function __construct()
     {

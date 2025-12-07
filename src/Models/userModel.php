@@ -100,6 +100,37 @@ class UserModel extends Model
         );
     }
 
+    public function update_preferences_with_mongoDB(int $userId, array $preferences):void{
+
+        $mongoConnexion = MongoManager::getInstance();
+        $collection= $mongoConnexion->getCollection('preferences');
+
+
+        $document= [
+            'user_id' => $userId,
+            'preferences' => $preferences,
+            'update_at' => new UTCDateTime()
+        ];
+
+        // Ajout des preferences
+        $collection->findOneAndUpdate(
+            ['user_id' => $userId],
+            ['$set' => $document],
+            ['upsert' => true]
+        );
+    }
+
+    public function get_preferences(int $userId):array{
+
+        $mongoConnexion = MongoManager::getInstance();
+        $collection=
+        $mongoConnexion->getCollection('preferences');
+
+        $preferences = $collection->findOne(['user_id' =>$userId]);
+
+        return $preferences ? (array) $preferences['preferences'] : [] ;
+    }
+
 
     public function email_exist(string $email, ?int $excludeUserId = null): bool
     {

@@ -3,16 +3,15 @@ namespace Ecoride\Ecoride\Services;
 
 use Ecoride\Ecoride\Core\Database;
 use Ecoride\Ecoride\Core\Service;
-use Ecoride\Ecoride\Models\VehicleModel;
 
 class UserService extends Service{
 
     private ValidationService $validationService;
 
-    private VehicleModel $vehicleModel;
 
     private array $profileErrors= [];
     private array $vehicleErrors= [];
+    private array $preferenceErrors = [];
 
     private \PDO $connexion;
 
@@ -20,7 +19,6 @@ class UserService extends Service{
     {
         parent::__construct();
         $this->validationService = new ValidationService();
-        $this->vehicleModel = new VehicleModel();
         $this->connexion = Database::getInstance()->getConnection();
     }
 
@@ -161,6 +159,24 @@ class UserService extends Service{
              error_log("Erreur ajout vehicule: {$e->getMessage()}");
              return false;
          }
+     }
+     public function add_preference(int $userId, array $preferencesArray): bool
+     {
+         $this->validationService->clear_errors();
+         $this->validationService->validate_required('preference', array_keys($preferencesArray)[0]);
+         $this->validationService->validate_max('preference', array_keys($preferencesArray)[0], 64);
+ 
+         if ($this->validationService->has_errors()) {
+             $this->preferenceErrors = $this->validationService->get_errors();
+             return false;
+         }
+ 
+         $this->userModel->save_preferences_with_mysql($userId, $preferencesArray);
+ 
+         $preference = [array_keys($preferencesArray)[0] => array_values($preferencesArray)[0] ?? false];
+         $this->userModel->save_prefrences_with_mongoDB($userId, $preference);
+ 
+         return true;
      }
  
      public function get_errors(): array

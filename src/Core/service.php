@@ -3,18 +3,23 @@
 namespace Ecoride\Ecoride\Core;
 
 use Ecoride\Ecoride\Models\UserModel;
+use Ecoride\Ecoride\Models\VehicleModel;
 
 class Service
 {
     protected Session $session;
     protected UserModel $userModel;
 
+    protected VehicleModel $vehicleModel;
+
     public function __construct()
     {
         $this->session = new Session();
         $this->userModel = new UserModel();
+        $this->vehicleModel= new VehicleModel();
     }
-    public function update_user_session($user) {
+    public function update_user_session($user):void {
+        $userVehicles= $this->vehicleModel->get_user_vehicles($user->user_id);
         $this->session->set_session('user', [
             'id' => $user->user_id,
             'nom' => $user->nom ?? null,
@@ -25,9 +30,12 @@ class Service
             'adresse' => $user->adresse ?? null,
             'photo' => $user->photo ?? null,
             'date_creation' => $user->date_creation ?? null,
+            'voitures' => $userVehicles,
+            'nombreVoitures' => count($userVehicles),
+            'preferences' => $this->userModel->get_preferences($user->user_id),
             'roles' => [
-                $this->userModel->is_driver($user->user_id) ? 'Chauffeur' : null,
-                $this->userModel->is_passenger($user->user_id) ? 'Passager' : null
+                $this->userModel->is_driver($user->user_id) ? 'chauffeur' : null,
+                $this->userModel->is_passenger($user->user_id) ? 'passager' : null
             ],
             'adminInfo' => $this->userModel->get_role_info($user->user_id) ?? null
         ]);
@@ -75,7 +83,13 @@ class Service
         }
     }
 
-
+public function require_driver(): void{
+    $this->require_auth();
+    if(!$this->is_driver()){
+        $this->session->set_flash('error', 'Acces refuse');
+        redirect('profile',['pseudo' => $this->get_connected_user()['pseudo']]);
+    }
+}
  public function logout(): void
     {
         $this->session->remove_session('user');

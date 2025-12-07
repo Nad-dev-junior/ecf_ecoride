@@ -32,4 +32,14 @@ class VehicleModel extends Model{
         $vehicleData['user_id'] = $userId;
         return $this->create($vehicleData);
     }
+
+    public function get_user_vehicles(int $userId): false|array{
+
+        $stmt= $this->connection->prepare("
+        SELECT v.*, libelle as marque FROM voiture v JOIN marque m on V.marque_id = m.marque_id WHERE v.user_id = ? ");
+
+        $stmt->execute([$userId]);
+
+        return $stmt->fetchAll();
+    }
 }
