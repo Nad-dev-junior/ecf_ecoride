@@ -66,7 +66,7 @@ Apache
 
 MySQL (si vous n’utilisez pas MySQL installé indépendamment)
 
-✔ MySQL installé séparément
+- MySQL installé séparément
 
 Si MySQL a été installé directement sur Windows, vous utiliserez CMD pour gérer votre base.
 
@@ -159,6 +159,7 @@ Dans le terminal du projet :
 php seed.php
 
 Deploiement: le site n'est pas encore disponible en ligne.
+
 
 
 
