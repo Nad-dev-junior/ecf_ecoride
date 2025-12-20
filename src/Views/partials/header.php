@@ -31,7 +31,7 @@
                         <a href="<?= url('/') ?>" class="nav-link px-3 ms-3 er-text-dark active" aria-current="page">Accueil</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link px-3 ms-3 er-text-dark ">Covoiturages</a>
+                        <a href="<?= url('carpool') ?>" class="nav-link px-3 ms-3 er-text-dark ">Covoiturages</a>
                     </li>
                     
                     <li class="nav-item">

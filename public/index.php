@@ -43,6 +43,9 @@ $router->post('/become-partner/handle','PartnerController@handle_become_partner'
 $router->get('/add-car', 'VehicleController@add_car');
 $router->post('/add-car/handle', 'VehicleController@handle_add_car');
 $router->post('add-preference/handle', 'UserController@handle_add_preference');
+$router->get('/carpool', 'CarpoolController@index');
+$router->get('/carpool/search', 'CarpoolController@search');
+$router->get('/carpool/autocomplete', 'CarpoolController@autocomplete');
 $router->get('/logout', 'AuthController@logout');
 
 

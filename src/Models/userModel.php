@@ -71,6 +71,22 @@ class UserModel extends Model
         return $stmt->execute([$userId]);
     }
 
+    public function get_or_create_preference(string $preference) {
+        // Si la preference existe, on recupere son identifiant pour faire la mise a jour de l'utiliateur
+        $stmt = $this->connection->prepare("SELECT preference_id FROM preference WHERE preference = ?");
+        $stmt->execute([$preference]);
+        $result = $stmt->fetch();
+
+        if ($result) return $result->preference_id;
+
+        // Si la preference n'existe pas, on la creee et on renvoie son identifiant poru la mise a jour des
+        // preferences utilisateurs
+        $stmt = $this->connection->prepare("INSERT INTO preference (preference) VALUES (?)");
+        $stmt->execute([strtolower($preference)]);
+
+        return $this->connection->lastInsertId();
+    }
+
     public function save_preferences_with_mysql(int $userId, array $preferences): true
     {
         $stmt = $this->connection->prepare(" INSERT INTO preference (propriete, valeur, conducteur_id) VALUES (?,?,?)");
@@ -130,7 +146,22 @@ class UserModel extends Model
 
         return $preferences ? (array) $preferences['preferences'] : [] ;
     }
+    
+    public function get_preferences_with_mysql(int $userId): false|array
+    {
+        $query = "
+            SELECT p.preference_id, p.preference, pu.valeur_preference, pu.user_id
+            FROM preference p 
+            JOIN preference_user pu on p.preference_id = pu.preference_id
+            WHERE pu.user_id = ?
+            ORDER BY pu.user_id
+        ";
 
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute([$userId]);
+
+        return $stmt->fetchAll();
+    }
 
     public function email_exist(string $email, ?int $excludeUserId = null): bool
     {

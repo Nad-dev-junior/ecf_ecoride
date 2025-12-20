@@ -78,7 +78,7 @@
                                     Devenir Partenaire
                                 </a>
                             <?php endif; ?>
-                            <a href="#" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400">
+                            <a href="<?= url('carpool') ?>" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400">
                                 Touver un covoiturage
                             </a>
                         </div>
