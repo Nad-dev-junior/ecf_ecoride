@@ -69,7 +69,7 @@ class AddressAutocompleteService extends Service
 
     private function get_api_suggestions(string $query): array
     {
-        $url = "https://api-adresse.data.gouv.fr/search/?q=". urlencode($query) . "&limit=8&type=street&autocomple=1";
+        $url = "https://api-adresse.data.gouv.fr/search/?q=". urlencode($query) . "&limit=8&type=street&autocomplete=1";
 
         try {
             $context = stream_context_create([

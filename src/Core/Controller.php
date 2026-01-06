@@ -92,5 +92,20 @@ class Controller
         exit();
     }
 
+    public function build_clear_filters_url(): string
+    {
+        $params = $_GET;
+        unset($params['is_ecologic'], $params['prix_max'], $params['duree_max'], $params['note_min'], $params['url']);
+
+        return url('carpool/search', $params);
+
+    }
+
+    public function build_remove_filter_url(string $filterName): string {
+        $params = $_GET;
+        unset($params[$filterName], $params['url']);
+        return url('carpool/search', $params);
+    }
+
   
 }

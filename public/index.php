@@ -59,7 +59,7 @@ $router->dispatch();
     } else {
         error_log("Erreur: {$e->getMessage()} dans {$e->getFile()} : {$e->getLine()}");
         http_response_code(500);
-        echo "Une erreur s'est preoduites. Notre equipe y travaille";
+        echo "Une erreur s'est produites. Notre equipe y travaille";
     }
 
 }

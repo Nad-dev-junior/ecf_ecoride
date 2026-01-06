@@ -85,4 +85,28 @@ document.addEventListener('DOMContentLoaded', () => {
              document.getElementById('search-form').submit();
          })
      }
+
+      /*=== FILTRES  ===*/
+    // Soumission automatique du formulaire apres un certain moment
+    const filterInputs = document.querySelectorAll('#filtersForm input');
+    filterInputs.forEach((input) => {
+        input.addEventListener('change', () => {
+            setTimeout(() => {
+                document.getElementById('filtersForm').submit();
+            }, 1000);
+        })
+    })
+
+    // Gestion des input de type range
+    const allRangeInput = document.querySelectorAll('input[type=range]');
+    console.log(allRangeInput);
+    allRangeInput.forEach((range) => {
+        // range.value = 0;
+        const rangeOutput = range.nextElementSibling;
+        rangeOutput.textContent = range.value;
+
+        range.addEventListener('input', function(){
+            rangeOutput.textContent = this.value;
+        })
+    })
 });

@@ -143,3 +143,5 @@ VALUES ('passager'),
 INSERT INTO preference (preference)
 VALUES ('animaux'),
        ('fumeurs');
+
+       
