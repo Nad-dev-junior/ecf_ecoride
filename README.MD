@@ -1,164 +1,151 @@
 #Description du projet
 
 EcoRide est une plateforme de covoiturage permettant aux utilisateurs de proposer ou réserver des trajets en voiture en privilégiant les déplacements écologiques.
-L’application gère plusieurs rôles : Visiteur, Utilisateur, Chauffeur, Passager, Employé, Administrateur.
 
-Fonctionnalités principales :
-
-Création de compte & authentification sécurisée
-
-Recherche de covoiturages
-
-Participation à un trajet (gestion des crédits)
-
-Saisie et gestion des trajets pour les chauffeurs
-
-Système d’avis et validation par les employés
-
-Tableau de bord administrateur et gestion des comptes
-
-Mise à jour des crédits / notifications / statistiques
-
-Technologies utilisées
-Front-end
-
-HTML5
-
-CSS3 (Bootstrap)
-
-JavaScript
-
-Back-end
-
-PHP (PDO)
-
-MVC 
-
-Base de données
-
-Base relationnelle : MySQL / MariaDB
-
-Base NoSQL : MongoDB
+Les utilisateurs sont répartis en deux catégories : 
+1. Les rôles administratifs (Visiteur, Utilisateur, Employé, Administrateur)
+2. Les rôles usagers (Chauffeur, Passager).
 
 
-1 Guide d’installation complet du projet full-stack en local
- 1.1Cloner le projet
+### Fonctionnalités principales :
 
-Ouvrir un terminal.
+    1. Création de compte & authentification sécurisée
+    2. Recherche de covoiturages
+    3. Participation à un trajet (gestion des crédits)
+    4. Saisie et gestion des trajets pour les chauffeurs
+    5. Système d’avis et validation par les employés
+    6. Tableau de bord administrateur et gestion des comptes
+    7. Mise à jour des crédits / notifications / statistiques
 
-Cloner le dépôt Git :
+### Technologies utilisées
+#### Front-end
+1. HTML 5
+2. CSS 3 (Classique + Framework Bootstrap 5)
+3. JavaScript (Vanilla, Bootstrap 5, JQuery et Owl Carousel)
 
-git clone <URL_DU_REPO>
+#### Back-end
+
+1. PHP avec extension PDO pour MySQL/MariaDB
+
+#### Architecture
+Modèle - Vue - Contrôleur
+
+#### SGBD
+1. MySQL / MariaDB Base de donnees relationelle
+2. MongoDB Base de donnees document
+
+#### Editeur de texte
+Un editeur de votre choix
+
+# Installation du projet.
+## Prérequis
+Serveur XAMPP (Recommandé), WAMP ou autre ...
+PHP 8.2+
+MariaDB 10.4 ou MySQL 5.7
+Apache 2.4
+Composer
+Navigateur Web récent
 
 
-2.Ouvrir le projet dans Visual Studio Code.
+### 1. Cloner le projet
+Placer le projet dans le dossier htdocs de XAMPP
 
-2.1 Installer les outils nécessaires
-- Visual Studio Code
+```bash
+git clone https://github.com/Nad-dev-junior/ecoride.git
+```
 
-Installer VS Code depuis le site officiel.
+Chemin attendu
+``` C:\xampp\htdocs\ecoride```
 
-- XAMPP
+### 2. Installer les dependances PHP
+A la racine du projet
+``` composer install ```
 
-Installer XAMPP, puis lancer :
+Le dossier ```vendor/``` est généré automatiquement
 
-Apache
+### 3. Configuration Apache et réécriture d'URL
+1. Le projet utilise Apache avec le mod_rewrite
+2. Un fichiers ```.htaccess```  dans le dossier ```public/```
 
-MySQL (si vous n’utilisez pas MySQL installé indépendamment)
+Vérifier que le module ```rewrite``` est activé dans ```httpd.conf```
 
-- MySQL installé séparément
+```bash
+LoadModule rewrite_module modules/mod_rewrite.so
+```
 
-Si MySQL a été installé directement sur Windows, vous utiliserez CMD pour gérer votre base.
-
-2.2 Configurer un domaine local (Virtual Host)
-
-Ouvrir :
-xampp/apache/conf/extra/httpd-vhosts.conf
+Ouvrir ```xampp/apache/conf/extra/httpd-vhosts.conf```
 
 Ajouter un VirtualHost, par exemple :
 
+```bash
 <VirtualHost *:80>
     DocumentRoot "C:/xampp/htdocs/ecoride"
     ServerName ecoride.local
 </VirtualHost>
+```
 
+Modifier le fichier hosts ```127.0.0.1   ecoride.local```
 
-Modifier le fichier hosts :
+Redémarrer Apache après modification
 
-127.0.0.1   ecoride.local
+### 4. Configuration de la base de données
+1. Lancer Apache et MariaDB depuis XAMPP
+2. Executer le fichier ```ecoride/src/database/ecoride.sql``` 
 
+### 5. Configuration de l'application
+Renseigner les accès à la base de données dans le fichier de configuration ```/core/database.php```
 
-Redémarrer Apache.
+Exemple:
+```php
+const DB_HOST = 'localhost';
+const DB_NAME = 'ecoride';
+const DB_USER = 'root';
+const DB_PASSWORD = 'root';
+```
+### 6. point d'entrée de l'application
+Le point d'entrée est ```/public/index.php```
 
-2.3 Installer les dépendances PHP
-- Installer Composer
+L'architecture repose sur le pattern MVC avec routage personnalisé. Accéder à l'application par ```http://ecoride.local```
 
-Dans le dossier du projet :
+#### Architecture du projet
+```bash
+ecoride/
+│── config/           # Configuration ( constantes)
+│── public/           # Point d’entrée + assets publics
+│   ├── assets/
+│   └── index.php
+│   └── .htaccess
+│── src/
+│   ├── Controllers/
+│   ├── Core/
+│   ├── database/
+│   ├── Models/
+│   ├── Services/
+│   └── Views/
+│── vendor/            # Dépendances Composer
+│── .htaccess
+│── composer.json
+│── seed.php           # Remplir la base de données 
+                       # avec des données de test
+```
 
-composer install
+#### Compte de test
+Le fichier ```ecoride/src/database/seeder.php``` contient une logique de fixture executé par ```ecoride/seed.php``` qui permet de peupler la base de données avec des fausses données réalistes pour des tests.
 
-- Installer Faker
-composer require fakerphp/faker
+Peupler la base de donnees: ouvrir un terminal a la racine du projet et lancer la commande ```php seed.php```
 
-- Installer Whoops (pour afficher les erreurs proprement)
-composer require filp/whoops
+Le compte administrateur est:
+```
+username: abdallah1
+password: 123456789
+```
 
-
-2.4 Création de la base de données via CMD (méthode utilisée)
-
--Ouvrir CMD.
-
--Se connecter à MySQL installé sur votre PC :
-
--mysql -u root -p
-Créer la base :
-CREATE DATABASE IF NOT EXISTS ecoride;
-
-2.5 Connexion à la base dans VS Code + création des tables
-- Installer l’extension MySQL dans VS Code
-
-Rechercher : MySQL.
-
-Installer l’extension.
-
-- Se connecter à la base MySQL créée via CMD
-
-Dans l’extension MySQL de VS Code :
-
-Ajouter une nouvelle connexion.
-
-Renseigner :
-
-Host : localhost
-
-Port : 3306
-
-Utilisateur : root
-
-Mot de passe : celui de votre MySQL
-
-Database : ecoride
-
--Création des tables
-
-Une fois connecté dans VS Code :
-
-Ouvrir un nouveau fichier SQL.
-
-CREATE DATABASE IF NOT EXISTS ecoride;
-copier les requêtes de création de tables qui sont dans le fichier database.sql.
-
-Les exécuter directement depuis l’extension MySQL.
-
-(C’est à ce moment que vous avez créé toutes tes tables.)
-
-- Générer les données de test
-
-Dans le terminal du projet :
-
-php seed.php
-
-Deploiement: le site n'est pas encore disponible en ligne.
+#### Sécurité
+1. Accès base de données via PDO
+2. Protection contre les injections SQL
+3. Hashage des mots de passe
+4. Contrôle des rôles
+2.2 Configurer un domaine local (Virtual Host)
 
 
 
