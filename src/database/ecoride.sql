@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS ecoride CHARACTER SET utf8mb4;
 USE ecoride;
 
 -- Table utilisateur
-CREATE TABLE user
+CREATE TABLE `user`
 (
     user_id        INT PRIMARY KEY AUTO_INCREMENT,
     nom            VARCHAR(64) ,
@@ -25,13 +25,13 @@ CREATE TABLE user
     index idx_nom_prenom (nom, prenom)
 );
 
-CREATE TABLE role
+CREATE TABLE `role`
 (
     role_id INT PRIMARY KEY AUTO_INCREMENT,
     libelle ENUM ('chauffeur', 'passager') DEFAULT 'passager' NOT NULL
 );
 
-CREATE TABLE role_user
+CREATE TABLE `role_user`
 (
     user_id INT,
     role_id INT,
@@ -40,13 +40,13 @@ CREATE TABLE role_user
     FOREIGN KEY (role_id) REFERENCES role (role_id) ON DELETE CASCADE
 );
 
-CREATE TABLE marque
+CREATE TABLE `marque`
 (
     marque_id INT PRIMARY KEY AUTO_INCREMENT,
     libelle   VARCHAR(64) NOT NULL UNIQUE
 );
 
-CREATE TABLE voiture
+CREATE TABLE `voiture`
 (
     voiture_id                    INT PRIMARY KEY AUTO_INCREMENT,
     modele                        VARCHAR(64) NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE voiture
     FOREIGN KEY (marque_id) REFERENCES marque (marque_id) ON DELETE CASCADE
 );
 
-CREATE TABLE covoiturage
+CREATE TABLE `covoiturage`
 (
     covoiturage_id INT PRIMARY KEY AUTO_INCREMENT,
     date_depart    DATE         NOT NULL,
@@ -86,20 +86,21 @@ CREATE TABLE covoiturage
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE reservation
+CREATE TABLE `reservation`
 (
+    reservation_id    INT NOT NULL AUTO_INCREMENT,
     passager_id       INT NOT NULL,
     covoiturage_id    INT NOT NULL,
     statut            ENUM ('en attente', 'confirme', 'annule') DEFAULT 'en attente',
     nb_place_reservee INT NOT NULL,
     date_creation     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (passager_id, covoiturage_id),
+    PRIMARY KEY (reservation_id, passager_id, covoiturage_id),
     FOREIGN KEY (passager_id) REFERENCES user (user_id),
     FOREIGN KEY (covoiturage_id) REFERENCES covoiturage (covoiturage_id),
     INDEX idx_covoiturage (covoiturage_id)
 );
 
-CREATE TABLE avis
+CREATE TABLE `avis`
 (
     avis_id        INT PRIMARY KEY AUTO_INCREMENT,
     commentaire    TEXT NULL,
@@ -116,14 +117,14 @@ CREATE TABLE avis
     INDEX idx_passager (passager_id)
 );
 
-CREATE TABLE preference
+CREATE TABLE `preference`
 (
     preference_id INT PRIMARY KEY AUTO_INCREMENT,
     preference     VARCHAR(64) NOT NULL,
     UNIQUE KEY unique_preference (preference)
 );
 
-CREATE TABLE preference_user
+CREATE TABLE `preference_user`
 (
     user_id INT,
     preference_id INT,
@@ -143,5 +144,3 @@ VALUES ('passager'),
 INSERT INTO preference (preference)
 VALUES ('animaux'),
        ('fumeurs');
-
-       

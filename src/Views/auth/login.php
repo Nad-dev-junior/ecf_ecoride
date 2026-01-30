@@ -4,7 +4,15 @@
             <div class="alert alert-danger">
                 <?= $this->session->get_flash('error') ?>
             </div>
-        <?php endif; ?>
+        <?php
+     endif; ?>
+
+<?php if ($this->session->has_flash('success')): ?>
+            <div class="alert alert-success">
+                <?= $this->session->get_flash('success') ?>
+            </div>
+        <?php
+     endif; ?>
 </section>
 
 <section class="register-form py-5 my-5" id="register-form">

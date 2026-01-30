@@ -72,10 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('date-depart');
     if (!dateInput.value || dateInput.value.trim() === '') {
         const now = new Date();
-        // console.log(now.toISOString());
         dateInput.value = now.toISOString().split('T')[0];
     }
-
+     // Preremplir le nombre de place avec la valeur 1 par defaut.
+const seatsField = document.getElementById(('nb_passagers'));
+if(!seatsField.value || seatsField.value.trim() === '' || seatsField.value === 0){
+    seatsField.value = 1;
+}
      /*===== Reservation covoiturage prochiane date suggeree =======*/
      const nextCarpool = document.getElementById('next-carpool');
      const nextDateField = document.getElementById('next-date');

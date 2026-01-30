@@ -46,7 +46,11 @@ $router->post('add-preference/handle', 'UserController@handle_add_preference');
 $router->get('/carpool', 'CarpoolController@index');
 $router->get('/carpool/search', 'CarpoolController@search');
 $router->get('/carpool/autocomplete', 'CarpoolController@autocomplete');
+$router->get('carpool/details' , 'CarpoolController@carpool_details');
+$router->post('carpool/apply' , 'CarpoolController@handle_apply');
+$router->get('carpool/apply-success' , 'CarpoolController@apply_success');
 $router->get('/logout', 'AuthController@logout');
+$router->get('/404', 'ErrorController@notfound');
 
 
 // $router->get('/trajets', 'RideController@index');

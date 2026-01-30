@@ -94,6 +94,12 @@
     font-weight: 900 !important;
 }
 
+.fs-10 {
+    font-size: 10px !important;
+}
+.fs-12 {
+    font-size: 12px !important;
+}
 .fs-14 {
     font-size: 14px !important;
 }
@@ -173,6 +179,10 @@
 
 .bg-green-80 {
     background-color: var(--main-green-80);
+    color: var(--chinese-black);
+}
+.bg-green-90 {
+    background-color: var(--main-green-90);
     color: var(--chinese-black);
 }
 .er-header {

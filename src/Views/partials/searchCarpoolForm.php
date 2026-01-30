@@ -40,7 +40,7 @@
                                                        class="form-control rounded-pill border-0 bg-transparent w-100 py-2 px-3">
                                             </div>
                                             <div class="col-md-5 col-sm-12">
-                                                <input type="number" placeholder="Nb.Passager" name="nb_passagers"
+                                                <input type="number" id="nb_passagers" placeholder="Nb.Passager" name="nb_passagers"
                                                        value="<?= sanitize($_GET['nb_passagers'] ?? '') ?>"
                                                        autocomplete="off"
                                                        class="form-control rounded-pill border-0 bg-transparent w-100 py-2 px-3">

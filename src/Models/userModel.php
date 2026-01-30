@@ -237,8 +237,8 @@ class UserModel extends Model
 
     public function get_user_roles($userId): array
     {
-        $stmt = $this->connection->prepare("
-            SELECT r.role_id, r.libelle FROM role r -- 1: Passager, 2: Chauffeur
+        $stmt = $this->connection->prepare(" SELECT 
+         r.role_id, r.libelle FROM role r -- 1: Passager, 2: Chauffeur
             JOIN role_user ru ON ru.role_id = r.role_id
             WHERE ru.user_id = ?
         ");
@@ -257,8 +257,8 @@ class UserModel extends Model
 
     public function is_driver($userId): bool
     {
-        $stmt = $this->connection->prepare("
-            SELECT COUNT(*)
+        $stmt = $this->connection->prepare("SELECT 
+         COUNT(*)
             FROM role_user ru 
             JOIN role r on r.role_id = ru.role_id
             WHERE r.libelle = 'chauffeur' AND ru.user_id = ?
@@ -270,8 +270,8 @@ class UserModel extends Model
 
     public function is_passenger($userId): bool
     {
-        $stmt = $this->connection->prepare("
-            SELECT COUNT(*)
+        $stmt = $this->connection->prepare("SELECT 
+         COUNT(*)
             FROM role_user ru 
             JOIN role r on r.role_id = ru.role_id
             WHERE r.libelle = 'passager' AND ru.user_id = ?

@@ -49,14 +49,12 @@
                         </h6>
 
                         <div class="user-info mb-3">
-                            Pseudo: <span class="mb-3 text-white-50 fw-300"><?= sanitize($user->pseudo ?? null)
-                                                                            ?></span>
+                            Pseudo: <span class="mb-3 text-white-50 fw-300"><?= sanitize($user->pseudo ?? null) ?>
+                            </span>
                             <br>
                             Email: <span class="mb-3 text-white-50 fw-300"><?= sanitize($user->email ?? null) ?></span>
                             <br>
-                            Inscrit le: <span class="mb-3 text-white-50 fw-300"><?= sanitize($user->date_creation ??
-                                                                                    null)
-                                                                                ?></span>
+                            Inscrit le: <span class="mb-3 text-white-50 fw-300"><?= sanitize($user->date_creation ?? null) ?></span>
                             <br>
                         </div>
 
@@ -67,8 +65,8 @@
                                     <i class="fas fa-car"></i>
                                 </a>
                                 <button type="button" class="btn btn-bg-green-2 rounded-pill me-1 px-4 fw-400"
-                                        data-bs-target="#OptionsModal"
-                                        data-bs-toggle="modal"
+                                    data-bs-target="#OptionsModal"
+                                    data-bs-toggle="modal"
                                     title="Ajouter une preference">
                                     <i class="fas fa-sliders-h"></i>
                                 </button>
@@ -121,7 +119,7 @@
 <section class="er-modal">
     <div class="container">
         <div class="modal fade" id="OptionsModal" tabindex="-1" aria-labelledby="forOptions" aria-hidden="true"
-             data-bs-backdrop="static" data-bs-keyboard="false">
+            data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -133,12 +131,12 @@
                             <div class="row align-items-center">
                                 <div class="mb-3 col-sm-9">
                                     <input type="text"
-                                           class="form-control px-4 border-0 outfit
+                                        class="form-control px-4 border-0 outfit
                                            <?= isset($errors['preference']) ? 'is-invalid' : '' ?>
                                            fw-300 rounded-pill fs-16"
-                                           id="property" name="property"
+                                        id="property" name="property"
                                         <?= sanitize($oldData['property'] ?? '') ?>
-                                           placeholder="Entrez une preference">
+                                        placeholder="Entrez une preference">
                                     <?php if (isset($errors['preference'])): ?>
                                         <div class="invalid-feedback ps-4"><?= $errors['preference'] ?></div>
                                     <?php endif; ?>
@@ -146,8 +144,8 @@
                                 <div class="mb-3 col-sm-3">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input er-check-input bg-green-80" type="checkbox"
-                                               role="switch"
-                                               id="value" name="value"
+                                            role="switch"
+                                            id="value" name="value"
                                             <?= (isset($oldData['value']) && $oldData['value'] === 'oui') ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="value"></label>
                                     </div>
