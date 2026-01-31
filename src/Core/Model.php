@@ -1,12 +1,11 @@
 <?php
-
 namespace Ecoride\Ecoride\Core;
 
 abstract class Model
 {
-    protected $connection;
+   protected \PDO $connection;
     protected $mongo;
-    protected $table;
+    protected string $table;
 
     public function __construct(){
         // Connexion MariaDB
@@ -23,7 +22,7 @@ abstract class Model
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
-   // Récupère toutes les lignes de la table SQL
+   // Récupère toutes les lignes de la table SQL;
     public function find_all(): false|array
     {
         $stmt = $this->connection->prepare("SELECT * FROM {$this->table}");
@@ -61,5 +60,17 @@ abstract class Model
         $collection = $this->mongo->getCollection($collection);
         return $collection->find($filter);
     }
+// recuperer les avis
+    public function get_notices() {
+        $stmt = $this->connection->query("
+            SELECT a.*, u.photo, u.nom, u.prenom
+            FROM avis a
+            JOIN user u ON a.passager_id = u.user_id
+            WHERE statut = 'publie' AND note >= '3.0'
+            ORDER BY date_creation DESC
+            LIMIT 12
+        ");
 
+        return $stmt->fetchAll();
+    }
 }

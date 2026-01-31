@@ -5,6 +5,12 @@ Ecoride\Ecoride\Core;
 
 class Router
 {
+    /**
+     * @param string $path Chemin de la route (ex: '/home')
+     * @param mixed $callback Callback ou contrôleur@méthode à exécuter
+     * @return static
+     */
+
     private array $routes = [];
 
     public function get($path, $callback): static
@@ -21,41 +27,56 @@ class Router
 
     public function dispatch()
     {
-        $url = $_GET['url'] ?? '';
-        $method = $_SERVER['REQUEST_METHOD'];
 
+       // URL demandée
+       $url = $_GET['url'] ?? '';
+        $method = $_SERVER['REQUEST_METHOD'] ;
+
+        $params = [];
+        foreach ($_GET as $key => $value) {
+            $params[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+        // Parcourt les routes enregistrées pour cette méthode
         foreach ($this->routes[$method] as $path => $callback) {
+            // Si l'URL correspond à une route enregistrée
             if ($this->matchRoute($path, $url)) {
-                return $this->executeCallback($callback);
+                // Exécute le callback associé à cette route
+                return $this->executeCallback($callback, $params);
             }
         }
         return
+            /** 
+             * @param string envoi une page 404 si la route n'est pas trouvée
+             */
             $this->handleNotFound();
     }
     private function matchRoute($route, $url): bool
     {
-        $route = trim($route, '/');
-        $url = trim($url, '/');
+        $route = '/' . trim($route, '/');
+        $url = '/' . trim($url, '/');
 
         return $route === $url;
     }
 
-    private function executeCallback($callback) {
-        if(is_string($callback)) {
-            list($controllerName, $method) = explode('@', $callback); //RideController@search
-            $controllerName = 'Ridecontroller';
-            $method = 'search';
+    private function executeCallback($callback)
+    {
+        // Si le callback est une chaîne de type "Controller@method"
+        if (is_string($callback)) {
+            list($controllerName, $method) = explode('@', $callback);
+            // Construit le namespace complet du contrôleur
             $controller = "Ecoride\\Ecoride\\Controllers\\$controllerName";
-
-            if(class_exists($controller)) {
+           
+            // Vérifie si le contrôleur existe
+            if (class_exists($controller)) {
                 $controllerInstance = new $controller();
+                // Vérifie si la méthode existe dans ce contrôleur
                 if (method_exists($controllerInstance, $method)) {
                     return $controllerInstance->$method();
                 }
 
                 return $this->handleError('Methode introuvable');
             }
-
+         
             return $this->handleError('Controleur introuvable');
         }
 
@@ -77,15 +98,13 @@ class Router
         http_response_code(500);
         $this->renderView('error/500');
         return false;
-
     }
 
     public function renderView($view, $data = []): bool
     {
         extract($data);
-        require_once "../src/Views/$view.php";
+        require_once "../src/Views/{$view}.php";
         return true;
     }
-
-   
 }
+//

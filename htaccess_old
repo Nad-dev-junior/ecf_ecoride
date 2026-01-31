@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteBase /ecf-ecoride/
+RewriteCond %{REQUEST_URI} !^/ecf-ecoride/public/
+RewriteRule ^(.*)$ public/index.php [L]
+
+
+
+
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteRule ^(.*)$ public/$1 [QSA,L]
+# </IfModule>

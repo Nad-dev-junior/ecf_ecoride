@@ -7,6 +7,9 @@ use MongoDB\Collection;
 
 class MongoManager
 {
+    const MONGO_DB_URI = 'mongodb://localhost:27017';
+    const MONGO_DB_NAME = 'ecoride';
+
     // Instance unique de la classe (pattern Singleton)
     private static ?MongoManager $instance = null;
       // Objet Client utilisé pour établir la connexion à MongoDB
@@ -18,8 +21,8 @@ class MongoManager
       // Constructeur privé : empêche la création directe d’objets avec "new"
     // Il initialise la connexion à MongoDB et sélectionne la base de données
     private function __construct() { 
-        $this->client = new Client(MONGO_DB_URI);
-        $this->database = $this->client->selectDatabase(MONGO_DB_NAME);
+        $this->client = new Client(self::MONGO_DB_URI);
+        $this->database = $this->client->selectDatabase(self::MONGO_DB_NAME);
     }
 
        // Méthode statique qui retourne une seule et unique instance de MongoManager
