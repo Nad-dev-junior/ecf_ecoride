@@ -500,7 +500,7 @@ class CarpoolModel extends Model
     }
 
     //  cette fonction retourne les passagers d'un covoiturage
-    private function get_carpool_passengers(int $carpoolId): false|array
+    public function get_carpool_passengers(int $carpoolId): false|array
     {
         $query = "SELECT 
                  r.passager_id, r.nb_place_reservee, r.date_creation, 
@@ -532,4 +532,39 @@ class CarpoolModel extends Model
         $stmt->execute([$driverId, $currentVehicleId]);
         return $stmt->fetchAll();
     }
+
+    public function update_carpool_status(int $carpoolId, int $driverId, string $statut): bool
+    {
+        $query = "
+            UPDATE covoiturage
+            SET statut = ?
+            WHERE covoiturage_id = ? and conducteur_id = ?
+        ";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute([$statut, $carpoolId, $driverId]);
+
+        return $stmt->rowCount() !== 0;
+    }
+
+    public function log_carpool_event(int $carpoolId, string $event, array $data): void
+    {
+        try {
+            if ($this->mongo) {
+                $collection = $this->mongo->getCollection('carpool_events');
+                $eventData = [
+                    'carpool_id' => $carpoolId,
+                    'event' => $event,
+                    'data' => $data,
+                    'timestamp' => new UTCDateTime()
+                ];
+
+                $collection->insertOne($eventData);
+            }
+        } catch (\Exception $e) {
+            error_log("Erreur journalisation evenement: {$e->getMessage()}");
+        }
+    }
+
+
 }

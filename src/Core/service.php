@@ -2,6 +2,7 @@
 
 namespace Ecoride\Ecoride\Core;
 
+use Ecoride\Ecoride\Models\CarpoolModel;
 use Ecoride\Ecoride\Models\UserModel;
 use Ecoride\Ecoride\Models\VehicleModel;
 
@@ -11,12 +12,14 @@ class Service
     protected UserModel $userModel;
 
     protected VehicleModel $vehicleModel;
+    protected CarpoolModel $carpoolModel;
 
     public function __construct()
     {
         $this->session = new Session();
         $this->userModel = new UserModel();
         $this->vehicleModel= new VehicleModel();
+        $this->carpoolModel = new CarpoolModel();
     }
     public function update_user_session($user):void {
         $userVehicles= $this->vehicleModel->get_user_vehicles($user->user_id);
