@@ -6,8 +6,8 @@ use Ecoride\Ecoride\Core\Service;
 use Ecoride\Ecoride\Models\CarpoolModel ;
 
 class CarpoolService extends Service{
+
     private \PDO $connection;
-    private CarpoolModel $carpoolModel;
 
     public function __construct(){
         parent::__construct();
@@ -127,4 +127,6 @@ class CarpoolService extends Service{
         }
 
     }
+
+    
 }

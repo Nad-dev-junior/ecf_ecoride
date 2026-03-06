@@ -500,11 +500,11 @@ class CarpoolModel extends Model
     }
 
     //  cette fonction retourne les passagers d'un covoiturage
-    private function get_carpool_passengers(int $carpoolId): false|array
+    public function get_carpool_passengers(int $carpoolId): false|array
     {
         $query = "SELECT 
                  r.passager_id, r.nb_place_reservee, r.date_creation, 
-                 u.user_id, nom, prenom, pseudo, credits, photo
+                 u.user_id, nom, email, prenom, pseudo, credits, photo
              FROM reservation r 
              JOIN user u on r.passager_id = u.user_id
              WHERE r.covoiturage_id = ?
@@ -531,5 +531,130 @@ class CarpoolModel extends Model
         $stmt = $this->connection->prepare($query);
         $stmt->execute([$driverId, $currentVehicleId]);
         return $stmt->fetchAll();
+    }
+
+    // cette function permet de recupérer les covoiturage d'un utilisateur lorsqu'il est un chauffeur 
+    public function get_driver_carpools(int $driverId, ?string $statut = null): array{
+        $query= " SELECT 
+        c.covoiturage_id, date_depart, heure_depart, lieu_depart, lieu_arrivee, c.statut, nb_places, COUNT(r.passager_id) as nb_passagers, ( SELECT COUNT(*) FROM reservation r2 WHERE r2.covoiturage_id = c.covoiturage_id AND r2.statut = 'confirme' ) as passagers_confirmes,
+        (
+            c.nb_places - COALESCE(
+                (
+                    SELECT SUM (nb_place_reservee) FROM reservation WHERE reservation.covoiturage_id = c.covoiturage_id AND reservation.statut = 'confirme'
+                ) , 0)
+        ) as places_restantes FROM covoiturage c LEFT JOIN reservation r on c.covoiturage_id = r.covoiturage_id AND r.statut = 'confirme' WHERE c.conducteur_id = ?";
+        $params = [$driverId];
+
+        if($statut){
+            $query .= "AND c.staut = ?";
+            $params[]= $statut;
+        }
+
+        $query .= " GROUP BY c.covoiturage_ORDER BY c.date_depart DESC, c.heure_depart DESC" ;
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute($params);
+
+        return array_map(function ($carpool){
+            $departDatetime = new \DateTime($carpool->date_depart .' '. $carpool->heure_depart);
+            $now= new \DateTime();
+            $canStart = $now >= $departDatetime && $carpool -> statut === 'prevu' ;
+            $canEnd = $carpool->statut === 'en cours';
+            $canCancel = $carpool->statut === 'prevu';
+            return [
+                'id' => $carpool -> covoiturage_id,
+                'date_depart' => $carpool->date_depart, 'date_formatee' => date('d/m/y',strtotime($carpool->date_depart)),
+                'heure_formatee' =>date('H:i',
+                strtotime($carpool->heure_depart)),
+                'lieu_depart' =>$carpool->lieu_depart,
+                'lieu_arrivee' =>$carpool->lieu_arrivee,
+                'statut'=>$carpool->statut,
+                'nb_places'=>$carpool->nb_places,
+                'nb_passagers' => $carpool->nb_passagers,
+                'passagers_confirmes'=>$carpool->passagers_confirmes,
+                'places_restantes' => $carpool->places_restantes,
+                'can_start' => $canStart,
+                'can_end' => $canEnd,
+                'can_cancel' => $canCancel,
+                'is_past' => $now > $departDatetime,
+            ];
+        }, $stmt->fetchAll());
+    }
+
+    public function get_passenger_carpools(int $passengerId): array
+    {
+        $query = "SELECT 
+                r.reservation_id, r.passager_id, r.statut as statut_reservation, 
+                r.nb_place_reservee, r.date_creation, c.covoiturage_id, 
+                c.date_depart, c.heure_depart, c.lieu_depart, c.lieu_arrivee, 
+                c.statut as statut_covoiturage, c.nb_places, nom, prenom, email, 
+                adresse, pseudo, photo
+            FROM reservation r
+            JOIN covoiturage c on r.covoiturage_id = c.covoiturage_id
+            JOIN user u on c.conducteur_id = u.user_id
+            WHERE r.passager_id = ?
+            ORDER BY c.date_depart DESC, c.heure_depart DESC
+        ";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute([$passengerId]);
+
+        return array_map(function($carpool) {
+            return [
+                'id' => $carpool->covoiturage_id,
+                'date_depart' => $carpool->date_depart, //2026-03-19
+                'heure_depart' => $carpool->heure_depart, //12:04:45
+                'date_formatee' => date('d/m/Y', strtotime($carpool->date_depart)), //19/03/2026
+                'heure_formatee' => date('H:i', strtotime($carpool->heure_depart)), //12:04
+                'lieu_depart' => $carpool->lieu_depart,
+                'lieu_arrivee' => $carpool->lieu_arrivee,
+                'statut_c' => $carpool->statut_covoiturage,
+                'statut_r' => $carpool->statut_reservation,
+                'nb_places' => $carpool->nb_places,
+                'nb_places_reservees' => $carpool->nb_place_reservee,
+                'date_reservation' => date('d/m/Y', strtotime($carpool->date_creation)),
+                'conducteur' => [
+                    'nom' => $carpool->nom,
+                    'prenom' => $carpool->prenom,
+                    'pseudo' => $carpool->pseudo,
+                    'email' => $carpool->email,
+                    'photo' => $carpool->photo,
+                ],
+                'can_validate' => $carpool->statut_covoiturage === 'termine',
+                'can_review' => $carpool->statut_covoiturage === 'termine',
+            ];
+
+        }, $stmt->fetchAll());
+    }
+
+    public function update_carpool_status(int $carpoolId, int $driverId, string $statut): bool{
+
+        $query = "
+        UPDATE covoiturage SET statut = ? WHERE covoiturage_id = ?  AND conducteur_id=?
+        ";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute([$statut, $carpoolId,
+        $driverId]);
+
+        return $stmt->rowCount() !== 0 ;
+    }
+
+    public function log_carpool_event(int $carpoolId, string $event, array $data): void{
+        try{
+            if($this->mongo){
+                $collection= $this->mongo->getCollection('carpool_events');
+                $eventData = [
+                    'carpool_id' => $carpoolId,
+                    'event' => $event,
+                    'data' => $data,
+                    'timestamp' => new UTCDateTime()
+                ];
+
+                $collection->insertOne($eventData);
+            }
+        }catch(\Exception $e){
+            error_log("Erreur journalisation evenement {$e->getMessage()}");
+        }
     }
 }

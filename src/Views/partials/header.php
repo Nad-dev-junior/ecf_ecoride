@@ -52,6 +52,11 @@
                                                     ?>"
                                             class="dropdown-item">Mon Profil</a>
                                     </li>
+
+                                    <li>
+                                    <a href="<?= url('/carpool/my-carpools') ?>"
+                                       class="dropdown-item">Mes Covoiturages</a>
+                                </li>
                                     <?php if ($isDriver) : ?>
                                         <li>
                                             <a href="#" class="dropdown-item">Proposer Un trajet</a>

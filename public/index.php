@@ -49,6 +49,10 @@ $router->get('/carpool/autocomplete', 'CarpoolController@autocomplete');
 $router->get('carpool/details' , 'CarpoolController@carpool_details');
 $router->post('carpool/apply' , 'CarpoolController@handle_apply');
 $router->get('carpool/apply-success' , 'CarpoolController@apply_success');
+$router->get('/carpool/my-carpools', 'CarpoolManagerController@my_carpools');
+$router->get('/carpool/start', 'CarpoolManagerController@start_carpools');
+$router->get('/carpool/end', 'CarpoolManagerController@end_carpools');
+$router->get('/dashboard', 'AdminController@dashboard');
 $router->get('/logout', 'AuthController@logout');
 $router->get('/404', 'ErrorController@notfound');
 
