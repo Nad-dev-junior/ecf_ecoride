@@ -1,0 +1,47 @@
+PS C:\xampp\htdocs\Ecf-Ecoride> composer init 
+
+
+  Welcome to the Composer config generator  
+
+
+
+This command will guide you through creating your composer.json config.
+
+Package name (<vendor>/<name>) [oulhine/ecf-ecoride]: ecoride
+The package name ecoride is invalid, it should be lowercase and have a vendor name, a forward slash, and 
+a package name, matching: [a-z0-9_.-]+/[a-z0-9_.-]+
+Package name (<vendor>/<name>) [oulhine/ecf-ecoride]: ecoride/ecoride
+Description []: ecoride est une plateforme de covoiturage ecologique
+Author [Nadia <nadiaalmoustapha0@gmail.com>, n to skip]: nadia
+Minimum Stability []: 
+Package Type (e.g. library, project, metapackage, composer-plugin) []: 
+License []: 
+
+Define your dependencies.
+
+Would you like to define your dependencies (require) interactively [yes]? no
+Would you like to define your dev dependencies (require-dev) interactively [yes]? no
+Add PSR-4 autoload mapping? Maps namespace "Ecoride\Ecoride" to the entered relative path. [src/, n to skip]:
+
+{
+    "name": "ecoride/ecoride",
+    "description": "ecoride est une plateforme de covoiturage ecologique",
+    "autoload": {
+        "psr-4": {
+            "Ecoride\\Ecoride\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nadia"
+        }
+    ],
+    "require": {}
+}
+
+Do you confirm generation [yes]? yes
+Composer could not detect the root package (ecoride/ecoride) version, defaulting to '1.0.0'. See https://getcomposer.org/root-version
+Generating autoload files
+Generated autoload files
+PSR-4 autoloading configured. Use "namespace Ecoride\Ecoride;" in src/
+Include the Composer autoloader with: require 'vendor/autoload.php';

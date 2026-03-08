@@ -1,4 +1,4 @@
 /vendor
 /config/config.php
-/note.txt
-/env
+note.txtg
+.env
