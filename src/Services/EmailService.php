@@ -28,7 +28,7 @@ class EmailService
         string $validationToken
     ): bool
     {
-        $validationUrl = BASE_URL . "/carpool/validation?token=$validationToken";
+        $validationUrl = "/carpool/validation?token=$validationToken";
         $subject = "Votre covoiturage a demarré.";
         $message = <<<html
             <h2>Bonjour $passengerName</h2>
