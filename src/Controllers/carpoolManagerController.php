@@ -62,4 +62,29 @@ class CarpoolManagerController extends Controller
         $this->redirect('/carpool/my-carpools');
 
     }
+
+    public function end_carpools() {
+        $this->auth->require_driver();
+        if (!isset($_GET['covoiturage'])) {
+            $this->session->set_flash('error', "Aucun covoiturage selectionné.");
+            $this->redirect('/carpool/my-carpools');
+        }
+
+        $carpoolId = (int)$_GET['covoiturage'];
+        $driverId = $this->auth->get_connected_user_id();
+        $can_user_end = $this->carpoolManagerService->end_carpool($driverId, $carpoolId);
+
+        if ($can_user_end['success']) {
+            $flashMessage = <<<html
+                {$can_user_end['message']} <br>
+                {$can_user_end['notified_passengers']} passager(s) notifié(s) <br>
+                Les utilisateurs doivent desormais valider leur trajet
+            html;
+            $this->session->set_flash('success', $flashMessage);
+        } else {
+            $this->session->set_flash('error', $can_user_end['errors']);
+        }
+
+        $this->redirect('/carpool/my-carpools');
+    }
 }
